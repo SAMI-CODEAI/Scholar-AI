@@ -1,111 +1,78 @@
-# 🎓 Scholar AI - Project Context
+# 🎓 Scholar AI
 
-## 📖 Overview
-**Scholar AI** is an intelligent study assistant web application. It allows users to upload study materials (PDFs, Docs, Audio files) and automatically generates:
-- 📝 **Summaries**
-- 🗂️ **Flashcards**
-- ❓ **Quizzes**
+## 📖 About
+**Scholar AI** is an advanced, AI-powered study companion designed to streamline the learning process. By leveraging Google's Gemini 1.5 Flash models, it transforms raw study materials—PDFs, Word documents, and audio recordings—into structured, actionable learning aids.
 
-The application is designed for modern students, featuring a sleek "glassmorphism" UI and leveraging Google's **Gemini 1.5 Flash** for rapid content generation.
+## ✨ Core Features
+- **Smart Summarization:** Instantly distills complex documents into concise, markdown-formatted summaries with key points highlighted.
+- **Automated Flashcards:** Generates Q&A flashcards from uploaded content to aid active recall.
+- **Interactive Quizzes:** Creates multiple-choice quizzes to test comprehension and retention.
+- **Multi-Format Support:** Handles PDF, DOCX, TXT, and Audio (MP3/WAV) inputs seamlessly.
+- **Export Capabilities:** precision-formatted DOCX exports for offline study.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 ### **Frontend**
-- **Framework:** Angular 18+ (Standalone Components)
-- **Styling:** SCSS, Modern Dark Mode, Inter Font
-- **Authentication:** Firebase Authentication (Email/Password & Google Sign-In)
-- **Hosting:** Vercel (preferred) or Firebase Hosting
+- **Framework:** Angular 18+ (Standalone Architecture)
+- **Design:** Custom SCSS with Glassmorphism aesthetic & Dark Mode
+- **Authentication:** Firebase Auth (Secure Email & Google Sign-In)
+- **Deployment:** Vercel / Firebase Hosting
 
 ### **Backend**
-- **Framework:** Python Flask (Standard WSGI)
-- **AI Model:** Google Gemini 1.5 Flash (Optimized for speed)
-- **Speech-to-Text:** Google Cloud Speech-to-Text (with fallback/direct audio handling)
-- **Processing:** `pypdf` (PDF), `python-docx` (Word), `mutagen` (Audio duration)
-- **Deployment:** Vercel Serverless Functions (`@vercel/python`) or Google Cloud Run
+- **Runtime:** Python 3.11+ (Flask)
+- **AI Engine:** Google Gemini 1.5 Flash (Optimized for low-latency single-shot generation)
+- **Speech Processing:** Google Cloud Speech-to-Text & Mutagen
+- **Infrastructure:** Vercel Serverless Functions / Google Cloud Run
+
+---
+
+## 🚀 Setup & Deployment
+
+### **Prerequisites**
+- Node.js 18+
+- Python 3.11+
+- Google Cloud Project (with Gemini API enabled)
+- Firebase Project
+
+### **Environment Variables**
+Create a `.env` file in `backend-functions/` or configure in your deployment dashboard:
+```bash
+GEMINI_API_KEY=your_api_key_here
+GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials.json # Optional for GCS
+```
+
+### **1. Vercel Deployment (Recommended)**
+Scholar AI is optimized for Vercel. 
+1. Import this repository into Vercel.
+2. Add `GEMINI_API_KEY` to Environment Variables.
+3. Deploy.
+*(The included `vercel.json` handles all build & route configuration automatically)*
+
+### **2. Local Development**
+**Frontend:**
+```bash
+cd frontend-angular
+npm install
+npm start -- --port 4200
+```
+**Backend:**
+```bash
+cd backend-functions
+pip install -r requirements.txt
+python main.py
+```
+*(Access the app at http://localhost:4200)*
 
 ---
 
 ## 📂 Project Structure
-
-```text
-Scholar-AI/
-├── frontend-angular/          # Angular Single Page Application
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── components/    # (Home, Login, Guide)
-│   │   │   ├── services/      # (Auth, API)
-│   │   │   ├── environments/  # (Firebase Config)
-│   │   └── ...
-│   ├── firebase.json          # Firebase Hosting Config
-│   └── package.json
-│
-├── backend-functions/         # Flask API
-│   ├── main.py                # Main Application Logic (Endpoints)
-│   ├── requirements.txt       # Python Dependencies
-│   └── Dockerfile             # Container config for Cloud Run
-│
-├── deploy.sh                  # Script for Firebase+Cloud Run Deployment
-├── vercel.json                # Vercel Deployment Config
-└── context.md                 # Project Documentation (This file)
-```
+- `frontend-angular/`: The complete Angular client application.
+- `backend-functions/`: The Flask API server handling AI processing and file intake.
+- `deploy.sh`: Utility script for Google Cloud deployments.
+- `vercel.json`: Configuration for Vercel Serverless deployment.
 
 ---
 
-## 🔑 Key Features & Implementation Details
-
-1.  **Single-Shot AI Generation:**
-    - To support Vercel's 10-second timeout on free tier, the backend uses a **unified prompt** to generate the Title, Summary, Flashcards, and Quiz in a SINGLE API call to Gemini.
-    - **Optimization:** Switched to `gemini-1.5-flash` for lowest latency.
-
-2.  **Authentication:**
-    - Frontend: Uses `@angular/fire` to handle login.
-    - Backend: Verifies Firebase ID tokens using `firebase-admin`.
-    - **Local Dev:** Includes a "Demo User" fallback if local Google Credentials aren't set up, preventing auth errors during development.
-
-3.  **File Handling:**
-    - Uploads are processed in-memory (or temp storage) for immediate extraction.
-    - Large audio files (>55s) trigger robust GCS-based transcription (requires GCP credentials), while shorter ones use synchronous recognition.
-
----
-
-## 🚀 Environment Variables
-
-### **Backend (.env)**
-```bash
-GEMINI_API_KEY=AIzaSy...           # Required: Google Gemini API Key
-GOOGLE_APPLICATION_CREDENTIALS=... # Optional: Path to GCP Service Account (for Speech-to-Text)
-```
-
-### **Frontend (src/environments/environment.ts)**
-User-specific Firebase configuration:
-```typescript
-firebase: {
-  apiKey: "...",
-  authDomain: "...",
-  projectId: "...",
-  ...
-}
-```
-
----
-
-## 📜 Deployment
-
-### **Option 1: Vercel (Recommended)**
-- **Config:** `vercel.json` handles routing.
-- **Frontend:** Deploys as a static site.
-- **Backend:** Deploys `main.py` as a Serverless Function.
-- **Setup:** Import repo, set `GEMINI_API_KEY` env var, deploy.
-
-### **Option 2: Firebase + Cloud Run**
-- **Script:** Run `./deploy.sh`
-- **Requires:** Google Cloud Billing enabled (for Cloud Build/Run).
-- **Architecture:** Frontend on Firebase Hosting -> Rewrites `/api` -> Cloud Run Service.
-
----
-
-## 📝 Recent Updates
-- **Refactor:** Removed `functions-framework` dependency; standard Flask app now.
-- **Fixes:** Added local auth fallback, updated deprecated Gemini model names, and fixed Angular peer dependency issues.
+**Developed by Devansh V Purohit**
