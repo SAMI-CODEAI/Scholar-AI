@@ -24,7 +24,7 @@ export class GuideComponent implements OnInit {
     loading = true;
     error = '';
 
-    activeTab: 'summary' | 'flashcards' | 'quiz' = 'summary';
+    activeTab: 'summary' | 'flashcards' | 'quiz' | 'schedule' = 'summary';
 
     // Flashcard state
     currentCardIndex = 0;
@@ -61,7 +61,7 @@ export class GuideComponent implements OnInit {
         }
     }
 
-    setActiveTab(tab: 'summary' | 'flashcards' | 'quiz') {
+    setActiveTab(tab: 'summary' | 'flashcards' | 'quiz' | 'schedule') {
         this.activeTab = tab;
         if (tab === 'flashcards') {
             this.resetFlashcards();
@@ -175,6 +175,23 @@ export class GuideComponent implements OnInit {
         const url = window.location.href;
         navigator.clipboard.writeText(url);
         // TODO: Add toast notification
+    }
+
+    addToGoogleCalendar(session: any) {
+        const date = new Date();
+        date.setDate(date.getDate() + session.day_offset);
+        date.setHours(10, 0, 0, 0); // Default to 10:00 AM
+
+        const startTime = date.toISOString().replace(/-|:|\.\d\d\d/g, '');
+
+        const endDate = new Date(date.getTime() + session.duration_minutes * 60000);
+        const endTime = endDate.toISOString().replace(/-|:|\.\d\d\d/g, '');
+
+        const title = encodeURIComponent(`Study: ${session.title}`);
+        const details = encodeURIComponent(`${session.details}\n\nStudy Guide: ${window.location.href}`);
+
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startTime}/${endTime}&details=${details}`;
+        window.open(url, '_blank');
     }
 
     async signOut() {

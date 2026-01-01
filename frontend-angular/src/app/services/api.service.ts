@@ -24,6 +24,12 @@ export interface StudyGuide {
     summary: string;
     flash_cards: string[][];
     quiz: QuizQuestion[];
+    study_schedule?: {
+        day_offset: number;
+        title: string;
+        details: string;
+        duration_minutes: number;
+    }[];
     created_at: number;
     filename?: string;
 }

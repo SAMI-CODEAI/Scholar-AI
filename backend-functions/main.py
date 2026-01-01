@@ -209,6 +209,11 @@ def prompt_everything(prompt):
         "  \"quiz\": [\n"
         "    {\"question\": \"Q1\", \"possible_answers\": [\"A\",\"B\",\"C\",\"D\"], \"index\": 0},\n"
         "    ... (10 questions)\n"
+        "  ],\n"
+        "  \"study_schedule\": [\n"
+        "     {\"day_offset\": 1, \"title\": \"Review Summary\", \"details\": \"Read through the generated summary to grasp core concepts.\", \"duration_minutes\": 30},\n"
+        "     {\"day_offset\": 2, \"title\": \"Flashcard Session\", \"details\": \"Test your knowledge with the flashcards.\", \"duration_minutes\": 20},\n"
+        "     {\"day_offset\": 3, \"title\": \"Take Quiz\", \"details\": \"Final assessment using the generated quiz.\", \"duration_minutes\": 15}\n"
         "  ]\n"
         "}\n\n"
         "Transcript:\n" + prompt
@@ -224,7 +229,8 @@ def prompt_everything(prompt):
             "title": "Error Generating Guide",
             "summary": "The AI could not process this text within the time limit or format constraints.",
             "flash_cards": [],
-            "quiz": []
+            "quiz": [],
+            "study_schedule": []
         }
 
 # Deprecated individual prompt functions removed for performance

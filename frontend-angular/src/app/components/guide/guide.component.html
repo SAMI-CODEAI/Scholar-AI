@@ -64,6 +64,9 @@
                 <button class="tab" [class.active]="activeTab === 'quiz'" (click)="setActiveTab('quiz')">
                     ❓ Quiz
                 </button>
+                <button class="tab" [class.active]="activeTab === 'schedule'" (click)="setActiveTab('schedule')">
+                    📅 Schedule
+                </button>
             </div>
 
             <!-- Tab Content -->
@@ -232,6 +235,41 @@
                         <button class="btn-primary" (click)="resetQuiz()">
                             Try Again
                         </button>
+                    </div>
+                    }
+                </div>
+                }
+
+                <!-- Schedule Tab -->
+                @if (activeTab === 'schedule') {
+                <div class="schedule-section">
+                    <div class="section-header">
+                        <h2>Smart Study Schedule</h2>
+                        <p class="subtitle">AI-generated plan to master this material.</p>
+                    </div>
+
+                    @if (!guide.study_schedule || guide.study_schedule.length === 0) {
+                    <div class="empty-state">
+                        <span class="icon">📅</span>
+                        <p>No schedule generated for this guide.</p>
+                    </div>
+                    } @else {
+                    <div class="timeline">
+                        @for (session of guide.study_schedule; track $index) {
+                        <div class="timeline-item">
+                            <div class="timeline-marker">{{ session.day_offset }}</div>
+                            <div class="timeline-content">
+                                <div class="session-header">
+                                    <h3>Day {{ session.day_offset }}: {{ session.title }}</h3>
+                                    <span class="duration">⏱️ {{ session.duration_minutes }} min</span>
+                                </div>
+                                <p>{{ session.details }}</p>
+                                <button class="btn-calendar" (click)="addToGoogleCalendar(session)">
+                                    📅 Add to Google Calendar
+                                </button>
+                            </div>
+                        </div>
+                        }
                     </div>
                     }
                 </div>
