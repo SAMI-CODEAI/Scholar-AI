@@ -73,4 +73,8 @@ export class LoginComponent {
         this.isSignUp = !this.isSignUp;
         this.error = '';
     }
+
+    continueAsGuest() {
+        this.router.navigate(['/home']);
+    }
 }

@@ -54,6 +54,11 @@
       Continue with Google
     </button>
 
+    <button type="button" (click)="continueAsGuest()"
+      style="margin-top: 1rem; width: 100%; color: rgba(255,255,255,0.5); background: none; border: none; cursor: pointer; font-size: 0.9rem;">
+      Continue as Guest (Demo Mode)
+    </button>
+
     <p class="toggle-mode">
       {{ isSignUp ? 'Already have an account?' : "Don't have an account?" }}
       <a href="javascript:void(0)" (click)="toggleMode()">

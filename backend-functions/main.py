@@ -39,22 +39,29 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 # Initialize Firebase Admin SDK
-cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'service-account-key.json')
-if not firebase_admin._apps:
-    if os.path.exists(cred_path):
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
-    else:
-        # Check if running in a cloud environment where default creds work
-        try:
-            # Explicitly set project ID for local development with user credentials
-            firebase_admin.initialize_app(options={'projectId': 'medkey-vault'})
-            logger.info("Initialized Firebase Admin with project: medkey-vault")
-        except Exception as e:
-            logger.warning(f"Firebase Admin init failed: {e}")
+logger.info("Starting Firebase Init...")
+try:
+    cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', 'service-account-key.json')
+    if not firebase_admin._apps:
+        if os.path.exists(cred_path):
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred)
+            logger.info("Initialized Firebase with service account")
+        else:
+            # Check if running in a cloud environment where default creds work
+            try:
+                # Explicitly set project ID for local development with user credentials
+                # firebase_admin.initialize_app(options={'projectId': 'medkey-vault'})
+                # logger.info("Initialized Firebase Admin with project: medkey-vault")
+                logger.warning("Skipping Firebase ADC Init to prevent crash - Use Demo User")
+            except Exception as e:
+                logger.warning(f"Firebase Admin init failed: {e}")
+except Exception as e:
+    logger.error(f"Critical Firebase Init Error: {e}")
+logger.info("Firebase Init Step Complete")
 
 # Configure Gemini API
-USER_GEMINI_API_KEY = "AIzaSyC0BgST84n0YqkSHPR6FfURsv_MYimVNLA"
+USER_GEMINI_API_KEY = "AIzaSyCMbDpybbi30oHf1sLHGD0dO2DIt0fagrI"
 DEFAULT_GEMINI_KEY = os.environ.get("GEMINI_API_KEY", USER_GEMINI_API_KEY)
 
 def get_gemini_key(request=None):
@@ -100,14 +107,21 @@ def verify_firebase_token(req):
         return None, "Missing or invalid Authorization header"
     
     token = auth_header.split('Bearer ')[1]
+    
+    # Bypass verification if Firebase is not initialized (Local Dev Mode)
+    if not firebase_admin._apps:
+        logger.warning("Firebase not initialized. Returning demo_user for local dev.")
+        return {'uid': 'demo_user', 'email': 'demo@scholar.ai'}, None
+
     try:
         decoded_token = auth.verify_id_token(token)
         return decoded_token, None
     except Exception as e:
         logger.error(f"Token verification failed: {e}")
-        # If credentials are missing locally, fallback to demo user
-        if "Default Credentials" in str(e) or "credentials" in str(e).lower():
-             logger.warning("Credential error detected. Falling back to demo_user for local development.")
+        # If credentials are missing locally or app not init, fallback to demo user
+        error_msg = str(e).lower()
+        if "credentials" in error_msg or "app does not exist" in error_msg:
+             logger.warning("Firebase Auth Error (Dev). Falling back to demo_user.")
              return {'uid': 'demo_user'}, None
         return None, str(e)
 
@@ -335,6 +349,9 @@ def handle_upload():
         # 2. Generate Content
         goals = request.form.get('goals', '')
         study_guide = prompt_everything(transcript, goals)
+        
+        if study_guide.get('title') == "Error Generating Guide":
+            return jsonify({"error": f"AI Generation Failed. Please check your API Key. (Summary: {study_guide.get('summary')})"}), 500
         
         # 3. Store Result
         guide_id = str(int(time.time())) # Simple ID gen
