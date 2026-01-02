@@ -43,22 +43,23 @@ Scholar-AI/
 └── README.md
 ```
 
-## 🚀 Quick Start
+## 🚀 Quick Run (Local Development)
 
-### Prerequisites
+If you are in a dev environment with existing virtualenv and node_modules:
 
-- Node.js 18+ and npm
-- Python 3.11+
-- Google Cloud CLI (`gcloud`)
-- Firebase CLI (`firebase-tools`)
-- Google Cloud Project with billing enabled
+1. **Start Backend**:
+   ```bash
+   cd backend-functions
+   source venv/bin/activate
+   python main.py
+   ```
+2. **Start Frontend**:
+   ```bash
+   cd frontend-angular
+   npm start
+   ```
+3. **Access**: Open `http://localhost:4200`
 
-### 1. Clone & Setup
-
-```bash
-git clone <repository-url>
-cd Scholar-AI
-```
 
 ### 2. Configure Firebase
 
@@ -104,86 +105,25 @@ python main.py
 
 ---
 
-## 🔧 Configuration
+## 🦾 Agentic Study Features
 
-### Frontend Environment Variables
+Scholar AI is now equipped with an **Agentic Study System**:
 
-Edit `frontend-angular/src/environments/environment.ts`:
-
-```typescript
-export const environment = {
-  production: false,
-  firebase: {
-    apiKey: 'YOUR_API_KEY',
-    authDomain: 'YOUR_PROJECT.firebaseapp.com',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT.appspot.com',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    appId: 'YOUR_APP_ID'
-  },
-  apiUrl: 'http://localhost:8080/api'  // Local dev
-};
-```
-
-For production (`environment.prod.ts`), update `apiUrl` to your Cloud Run URL.
-
-### Backend Environment Variables
-
-```bash
-# .env file
-GOOGLE_CLOUD_PROJECT=your-project-id
-GEMINI_API_KEY=your-gemini-api-key
-GCS_BUCKET_NAME=your-storage-bucket
-```
+- ✅ **Study Goal Personalization**: Define specific goals for your material (e.g., "Explain like I'm 5").
+- ✅ **Dynamic Progress Tracking**: Mark sessions as completed to keep track of your learning.
+- ✅ **AI Motivational Nudges**: Get personalized encouragement based on your completion status.
+- ✅ **Intelligent Replanning**: Missed a day? The AI agent can automatically restructure your remaining schedule based on your progress and reasoning.
+- ✅ **Difficulty Tagging**: Key topics are tagged (Easy/Medium/Hard) for prioritizing your study.
+- ✅ **Revision Slots**: Automatic insertion of revision sessions for harder topics to ensure retention.
 
 ---
 
-## 🚢 Deployment
+## 🎨 Branding & UX
 
-### Deploy Frontend to Firebase Hosting
+- **Modern SVG Branding**: A new stylized "Scholar AI" logo replaced the generic emoji.
+- **Guest Access**: For rapid local development, use the "Continue as Guest" feature to bypass Firebase Login.
+- **Enhanced UI**: Refined study guide view with collapsible sections and interactive timelines.
 
-```bash
-cd frontend-angular
-
-# Build for production
-npm run build
-
-# Login to Firebase
-firebase login
-
-# Initialize (if not done)
-firebase init hosting
-# Select your project and use dist/frontend-angular/browser as public directory
-
-# Deploy
-firebase deploy --only hosting
-```
-
-### Deploy Backend to Cloud Run
-
-```bash
-cd backend-functions
-
-# Authenticate with Google Cloud
-gcloud auth login
-gcloud config set project YOUR_PROJECT_ID
-
-# Enable required APIs
-gcloud services enable run.googleapis.com
-gcloud services enable cloudbuild.googleapis.com
-gcloud services enable speech.googleapis.com
-gcloud services enable storage.googleapis.com
-
-# Build and deploy
-gcloud run deploy ai-learning-api \
-  --source . \
-  --platform managed \
-  --region us-central1 \
-  --allow-unauthenticated \
-  --set-env-vars "GEMINI_API_KEY=your-key,GCS_BUCKET_NAME=your-bucket"
-```
-
-After deployment, update your frontend `environment.prod.ts` with the Cloud Run URL.
 
 ---
 
@@ -192,21 +132,13 @@ After deployment, update your frontend `environment.prod.ts` with the Cloud Run 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/health` | Health check |
-| POST | `/api/upload` | Upload file and generate study guide |
-| GET | `/api/guide/:id` | Get study guide by ID |
-| GET | `/api/guides` | List all guides (authenticated) |
-| DELETE | `/api/guide/:id` | Delete guide (authenticated) |
-| GET | `/api/export/quiz/:id` | Export quiz as DOCX |
-| GET | `/api/export/flashcards/:id` | Export flashcards as DOCX |
-| GET | `/api/export/summary/:id` | Export summary as DOCX |
-
-### Authentication
-
-Protected endpoints require a Firebase ID token in the Authorization header:
-
-```
-Authorization: Bearer <firebase-id-token>
-```
+| POST | `/api/upload` | Upload file + goals and generate guide |
+| GET | `/api/guide/:id` | Get study guide data |
+| PUT | `/api/guide/:id/progress` | Update session completion status |
+| POST | `/api/guide/:id/replan` | Re-generate schedule based on missed tasks |
+| POST | `/api/motivation` | Get AI-generated encouragement |
+| GET | `/api/guides` | List all user guides |
+| DELETE | `/api/guide/:id` | Delete specific guide |
 
 ---
 
@@ -263,16 +195,15 @@ curl -X POST http://localhost:8080/api/upload \
 
 ---
 
-## 📝 Features
+## 📝 Key Features
 
-- ✅ **Multi-format file upload** with drag-and-drop
-- ✅ **AI-powered content generation** (Gemini Pro)
-- ✅ **Interactive flashcards** with flip animation
-- ✅ **Quiz mode** with scoring
-- ✅ **Export to DOCX** for all content types
-- ✅ **Firebase Authentication** (Email + Google)
-- ✅ **Responsive design** for mobile/desktop
-- ✅ **Share links** for study guides
+- ✅ **Agentic Autoplan**: AI-driven schedule restructuring.
+- ✅ **Multi-format upload** with goal-based generation.
+- ✅ **Interactive flashcards** & scored quizzes.
+- ✅ **Export to DOCX** (Quiz, Summary, Flashcards).
+- ✅ **Firebase Auth** (Legacy) + **Guest Mode** (New).
+- ✅ **Responsive design** (Mobile optimized).
+- ✅ **Personalized Study Tips** section.
 
 ---
 
